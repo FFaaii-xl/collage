@@ -1,0 +1,25 @@
+{
+  "name": "Collage Maker",
+  "short_name": "Collage",
+  "description": "Create beautiful photo collages with drag-drop, auto-arrange, and high-DPI export. 100% free and offline-capable.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#1a1a1a",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["photo", "graphics", "utilities"]
+}

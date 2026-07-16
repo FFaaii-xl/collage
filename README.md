@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Collage Maker
+
+A free, offline-capable photo collage creator built with Next.js, React-Konva, and Zustand.
+
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square)
+![React](https://img.shields.io/badge/React-19-blue?style=flat-square)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square)
+![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
+
+## Features
+
+- 🎨 **Drag & Drop Images** - Drop images directly from your computer
+- 📐 **Auto-Arrange** - Automatically arrange images in a neat grid
+- 📤 **High-DPI Export** - Export at 2x resolution for print quality
+- 🔒 **100% Offline** - All processing happens locally in your browser
+- 📱 **PWA Support** - Install as an app on your device
+- 🌙 **Dark Mode UI** - Clean, modern dark interface
+- 🔍 **Zoom & Pan** - Navigate large canvases easily
+- ⛔ **Aspect Ratio Lock** - Maintain image proportions when resizing
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+
+### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/FFaaii-xl/collage.git
+cd collage
+
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Usage
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Add Images**: Click "Add Images" button or drag & drop images from your computer
+2. **Arrange**: Use "Auto-Arrange" to automatically position images in a grid, or drag them manually
+3. **Customize**: Change canvas aspect ratio, background color, and gap size from the sidebar
+4. **Export**: Click "Export (High DPI)" to download your collage as a PNG image
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Controls
 
-## Learn More
+- **Scroll** - Zoom in/out
+- **Ctrl + Click** - Pan the canvas
+- **Click Image** - Select for editing
 
-To learn more about Next.js, take a look at the following resources:
+## Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Framework**: Next.js 16 (App Router)
+- **Canvas**: React-Konva
+- **State Management**: Zustand with persist middleware
+- **Styling**: Tailwind CSS
+- **PWA**: @ducanh2912/next-pwa
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project Structure
 
-## Deploy on Vercel
+```
+src/
+├── app/
+│   ├── layout.tsx      # Root layout with PWA meta
+│   ├── page.tsx        # Main collage page
+│   └── globals.css     # Global styles
+├── components/
+│   ├── CollageCanvas.tsx # React-Konva canvas component
+│   └── Toolbar.tsx       # Left sidebar controls
+├── store/
+│   ├── types.ts         # TypeScript interfaces
+│   └── useCollageStore.ts # Zustand store
+└── utils/
+    ├── autoArrange.ts   # Grid auto-arrange algorithm
+    ├── fileReader.ts    # FileReader API helpers
+    └── exportCanvas.ts  # Export utilities
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT License - Feel free to use this project for personal or commercial purposes.
