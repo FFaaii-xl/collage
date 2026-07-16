@@ -12,7 +12,7 @@ interface GridConfig {
 
 /**
  * Calculate optimal grid layout based on image count and canvas dimensions
- * Uses a simple row-based approach suitable for photo collages
+ * Images will fill the entire canvas with no empty space
  */
 export const calculateGridLayout = (
   imageCount: number,
@@ -32,7 +32,7 @@ export const calculateGridLayout = (
     };
   }
 
-  // Determine optimal columns and rows
+  // Determine optimal columns and rows to fill canvas
   let columns: number;
   let rows: number;
 
@@ -79,7 +79,8 @@ export const calculateGridLayout = (
 };
 
 /**
- * Auto-arrange images into a neat grid layout
+ * Auto-arrange images to FILL the entire canvas (no empty space)
+ * Uses "cover" style - images stretch to completely fill each cell
  */
 export const autoArrangeImages = (
   images: CollageImage[],
@@ -96,46 +97,106 @@ export const autoArrangeImages = (
     gap
   );
 
-  // Sort images by their original index to maintain order
-  const sortedImages = [...images];
-
-  const arrangedImages: CollageImage[] = sortedImages.map((img, index) => {
+  const arrangedImages: CollageImage[] = images.map((img, index) => {
     const col = index % grid.columns;
     const row = Math.floor(index / grid.columns);
 
-    // Calculate position
+    // Calculate position with gap
     const x = gap + col * (grid.cellWidth + gap);
     const y = gap + row * (grid.cellHeight + gap);
 
-    // Scale image to fit cell while maintaining aspect ratio
-    const imgAspectRatio = img.width / img.height;
-    const cellAspectRatio = grid.cellWidth / grid.cellHeight;
-
-    let newWidth: number;
-    let newHeight: number;
-
-    if (imgAspectRatio > cellAspectRatio) {
-      // Image is wider than cell - fit to width
-      newWidth = grid.cellWidth;
-      newHeight = Math.round(grid.cellWidth / imgAspectRatio);
-    } else {
-      // Image is taller than cell - fit to height
-      newHeight = grid.cellHeight;
-      newWidth = Math.round(grid.cellHeight * imgAspectRatio);
-    }
-
-    // Center the image in the cell
-    const offsetX = Math.round((grid.cellWidth - newWidth) / 2);
-    const offsetY = Math.round((grid.cellHeight - newHeight) / 2);
-
+    // FILL the cell completely - no gaps, no empty space
+    // Images stretch to exactly fill the cell
     return {
       ...img,
-      x: x + offsetX,
-      y: y + offsetY,
-      width: newWidth,
-      height: newHeight,
+      x: x,
+      y: y,
+      width: grid.cellWidth,
+      height: grid.cellHeight,
       rotation: 0,
     };
+  });
+
+  return arrangedImages;
+};
+
+/**
+ * Auto-arrange images in a masonry-style layout
+ * Maintains aspect ratio but fills width, variable height
+ */
+export const autoArrangeMasonry = (
+  images: CollageImage[],
+  canvasWidth: number,
+  canvasHeight: number,
+  gap: number,
+  columns: number = 3
+): CollageImage[] => {
+  if (images.length === 0) return [];
+
+  // Calculate column width
+  const totalGapWidth = gap * (columns + 1);
+  const columnWidth = Math.floor((canvasWidth - totalGapWidth) / columns);
+
+  // Calculate initial row height based on average aspect ratio
+  let totalAspectRatio = 0;
+  images.forEach((img) => {
+    totalAspectRatio += img.width / img.height;
+  });
+  const avgAspectRatio = totalAspectRatio / images.length;
+  const initialRowHeight = Math.floor(columnWidth / avgAspectRatio);
+
+  // Distribute images into rows
+  const rows: { images: CollageImage[]; height: number }[] = [];
+  let currentRowImages: CollageImage[] = [];
+  let currentRowHeight = 0;
+
+  images.forEach((img, index) => {
+    // Calculate image height in this column
+    const imgHeight = Math.floor(columnWidth / (img.width / img.height));
+
+    // If adding this image would exceed canvas height, start new row
+    if (currentRowHeight + imgHeight > canvasHeight && currentRowImages.length > 0) {
+      rows.push({ images: [...currentRowImages], height: currentRowHeight });
+      currentRowImages = [];
+      currentRowHeight = 0;
+    }
+
+    currentRowImages.push(img);
+    currentRowHeight = Math.max(currentRowHeight, imgHeight);
+  });
+
+  // Add last row
+  if (currentRowImages.length > 0) {
+    rows.push({ images: [...currentRowImages], height: currentRowHeight });
+  }
+
+  // Position images
+  const arrangedImages: CollageImage[] = [];
+  let yOffset = gap;
+
+  rows.forEach((row) => {
+    const scaleFactor = Math.min(
+      (canvasHeight - gap * (rows.length + 1)) / (yOffset + row.height > canvasHeight - gap ? row.height : canvasHeight - gap - yOffset - gap * (rows.length - 1)),
+      1
+    );
+
+    let xOffset = gap;
+    row.images.forEach((img) => {
+      const imgHeight = Math.floor((canvasWidth - gap * (row.images.length + 1)) / row.images.length / (img.width / img.height));
+
+      arrangedImages.push({
+        ...img,
+        x: xOffset,
+        y: yOffset,
+        width: Math.floor(columnWidth),
+        height: imgHeight,
+        rotation: 0,
+      });
+
+      xOffset += columnWidth + gap;
+    });
+
+    yOffset += Math.min(row.height, Math.floor((canvasHeight - gap * (rows.length + 1)) / rows.length)) + gap;
   });
 
   return arrangedImages;
