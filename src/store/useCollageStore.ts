@@ -97,8 +97,8 @@ export const useCollageStore = create<CollageState>()(
     {
       name: "collage-storage",
       storage: createJSONStorage(() => localStorage),
+      // Only persist settings, NOT images (images are too large for localStorage ~5MB limit)
       partialize: (state) => ({
-        images: state.images,
         settings: state.settings,
         mode: state.mode,
         lockAspectRatio: state.lockAspectRatio,
